@@ -272,6 +272,17 @@ export const Dashboard: React.FC = () => {
               <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '0.5rem', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
                 Inter-contract calling executes on-chain via the Soroban WASM runtime. Verified transaction logic handles validation in under 2 seconds.
               </div>
+              <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.25rem', fontSize: '0.75rem' }}>
+                <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>Need Testnet XLM?</span>
+                <a 
+                  href="https://laboratory.stellar.org/#account-creator?network=testnet" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  style={{ color: 'var(--secondary)', textDecoration: 'underline' }}
+                >
+                  Stellar Laboratory Faucet ↗
+                </a>
+              </div>
             </div>
           </div>
         </div>

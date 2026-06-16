@@ -18,6 +18,8 @@ Below is the step-by-step walkthrough of EventStar in action:
 
 ### 🎥 Interaction Demo (Video)
 A full interaction walkthrough of the EventStar platform showing wallet connection, event creation, ticket purchasing, and automated loyalty point rewards:
+- **YouTube Demo Video**: [Watch on YouTube (1-2 mins)](https://youtu.be/VuoXI8ODzDU)
+
 ![EventStar Interaction Demo](./screenshots/demo_video.webp)
 
 ---

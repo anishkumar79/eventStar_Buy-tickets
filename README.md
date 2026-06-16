@@ -2,7 +2,25 @@
 
 EventStar is an end-to-end decentralized dApp built on the Stellar network using Soroban smart contracts. It implements an event creation, ticketing, and loyalty points system that showcases inter-contract communication, unit testing, and real-time state emulation.
 
-![EventStar Dashboard Mockup](./eventstar_dashboard_mockup.png)
+---
+
+## 📸 Screenshots & Interaction Demo
+
+### 📱 Mobile Responsive UI & Interaction Flow
+
+Below is the step-by-step walkthrough of EventStar in action:
+
+| 1. Homepage & Wallet Connection | 2. Deploying a Smart Event |
+|:---:|:---:|
+| ![EventStar Homepage](./screenshots/eventstar_home.png) | ![Deploy Event Form](./screenshots/form_filled.png) |
+| **3. Ticket Purchase Success** | **4. Loyalty points Vault updated** |
+| ![Ticket Purchase](./screenshots/after_buy_ticket.png) | ![Loyalty Points](./screenshots/loyalty_vault_update.png) |
+
+### 🎥 Interaction Demo (Video)
+A full interaction walkthrough of the EventStar platform showing wallet connection, event creation, ticket purchasing, and automated loyalty point rewards:
+![EventStar Interaction Demo](./screenshots/demo_video.webp)
+
+---
 
 ## 🚀 Live Demo & Deployments
 - **Live Frontend Demo**: [https://eventstar.vercel.app](https://eventstar.vercel.app) *(Deployable via Vercel/Netlify)*

@@ -26,6 +26,7 @@ A full interaction walkthrough of the EventStar platform showing wallet connecti
 
 ## 🚀 Live Demo & Deployments
 - **Live Frontend Demo**: [https://event-star-buy-tickets.vercel.app/](https://event-star-buy-tickets.vercel.app/)
+- Demo link : [youtube](https://youtu.be/VuoXI8ODzDU)
 - **Stellar Event Manager Contract**: `CC3H2EXF3NZTLRYGUR657EXX3OQ72N3K6SZ5T5W44M7PFL3CSKDJ2MSR`
 - **Stellar Loyalty Token Contract**: `CD2B3G6S5X6M7T8U9V0W1X2Y3Z4A5B6C7D8E9F0G1H2I3J4K5L6M7N8O`
 - **Deployment Transaction Hash**: `2e7b8c73d9e84b8d7890a5f8b919d3fbe2c50e201b1b0e3f0a53cd6e8dcf49fe`

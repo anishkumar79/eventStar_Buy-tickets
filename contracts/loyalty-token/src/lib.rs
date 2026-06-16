@@ -1,4 +1,5 @@
 #![no_std]
+#![allow(unexpected_cfgs)]
 use soroban_sdk::{contract, contractimpl, Address, Env, Symbol, symbol_short};
 
 // State keys

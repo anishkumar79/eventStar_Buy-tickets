@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { getEventInfo, getTicketCount, getLoyaltyBalance, createEventTx, buyTicketTx } from '../utils/soroban';
 
 export interface Event {
   id: number;
@@ -87,6 +88,56 @@ export const StellarProvider: React.FC<{ children: React.ReactNode }> = ({ child
     if (savedConnected) setIsConnected(savedConnected === 'true');
   }, []);
 
+  // Synchronize on-chain data when connected to Testnet
+  useEffect(() => {
+    if (network !== 'testnet' || !isConnected || !publicKey) return;
+
+    const syncOnChainData = async () => {
+      try {
+        setLoading(true);
+        // Fetch loyalty balance
+        const balance = await getLoyaltyBalance(publicKey);
+        setLoyaltyBalance(balance);
+
+        // Fetch active on-chain event details
+        const updatedEvents = await Promise.all(
+          events.map(async (event) => {
+            try {
+              const onChainEvent = await getEventInfo(event.id);
+              return onChainEvent;
+            } catch {
+              // Fallback to local representation if not yet deployed on-chain
+              return event;
+            }
+          })
+        );
+        setEvents(updatedEvents);
+
+        // Fetch ticket counts for each event
+        const updatedTickets: { [eventId: number]: number } = {};
+        await Promise.all(
+          events.map(async (event) => {
+            try {
+              const count = await getTicketCount(publicKey, event.id);
+              if (count > 0) {
+                updatedTickets[event.id] = count;
+              }
+            } catch (err) {
+              console.warn(`Could not fetch ticket count for event #${event.id}`, err);
+            }
+          })
+        );
+        setUserTickets(updatedTickets);
+      } catch (err: any) {
+        console.error("Error synchronizing on-chain data:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    syncOnChainData();
+  }, [network, isConnected, publicKey]);
+
   // Save changes to localStorage helper
   const saveState = (updatedEvents: Event[], updatedTickets: { [eventId: number]: number }, updatedLoyalty: number) => {
     localStorage.setItem('eventstar_events', JSON.stringify(updatedEvents));
@@ -99,7 +150,6 @@ export const StellarProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setError(null);
     try {
       if (mode === 'sandbox') {
-        // Simulate local wallet connection
         const mockPubkey = "GB_MOCK_" + Math.random().toString(36).substring(2, 12).toUpperCase();
         setPublicKey(mockPubkey);
         setIsConnected(true);
@@ -109,7 +159,6 @@ export const StellarProvider: React.FC<{ children: React.ReactNode }> = ({ child
         localStorage.setItem('eventstar_network', 'sandbox');
         setSuccessMessage("Successfully connected to Sandbox Account!");
       } else {
-        // Testnet / Freighter wallet
         // @ts-ignore
         if (typeof window !== 'undefined' && window.stellar) {
           try {
@@ -156,13 +205,11 @@ export const StellarProvider: React.FC<{ children: React.ReactNode }> = ({ child
         throw new Error("Must connect wallet first.");
       }
 
-      // Check if event already exists
       if (events.some(e => e.id === eventId)) {
         throw new Error(`Event with ID ${eventId} already exists.`);
       }
 
       if (network === 'sandbox') {
-        // Simulate transaction delays
         await new Promise(resolve => setTimeout(resolve, 800));
 
         const newEvent: Event = {
@@ -178,9 +225,9 @@ export const StellarProvider: React.FC<{ children: React.ReactNode }> = ({ child
         saveState(updatedEvents, userTickets, loyaltyBalance);
         setSuccessMessage(`Event #${eventId} successfully created (Simulated transaction hash: 0x${Math.random().toString(16).substring(2, 18)})!`);
       } else {
-        // Real Stellar network transaction representation
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        // Mock successful transaction on Testnet for demonstration
+        // Invoking real create_event function on Soroban Smart Contract
+        const txHash = await createEventTx(publicKey, eventId, price, maxTickets);
+        
         const newEvent: Event = {
           id: eventId,
           organizer: publicKey,
@@ -191,7 +238,7 @@ export const StellarProvider: React.FC<{ children: React.ReactNode }> = ({ child
         const updatedEvents = [...events, newEvent];
         setEvents(updatedEvents);
         saveState(updatedEvents, userTickets, loyaltyBalance);
-        setSuccessMessage(`Event #${eventId} deployed on Stellar Testnet! Tx Hash: 8b6a3...8c1f9d`);
+        setSuccessMessage(`Event #${eventId} successfully created on Stellar Testnet! Tx Hash: ${txHash}`);
       }
     } catch (err: any) {
       setError(err.message || "Failed to create event.");
@@ -221,18 +268,14 @@ export const StellarProvider: React.FC<{ children: React.ReactNode }> = ({ child
       if (network === 'sandbox') {
         await new Promise(resolve => setTimeout(resolve, 1000));
 
-        // Update event
         const updatedEvents = [...events];
         updatedEvents[eventIndex] = {
           ...event,
           soldTickets: event.soldTickets + 1
         };
 
-        // Update user tickets
         const updatedTickets = { ...userTickets };
         updatedTickets[eventId] = (updatedTickets[eventId] || 0) + 1;
-
-        // Reward loyalty points (10 points per ticket) via simulated inter-contract communication
         const updatedLoyalty = loyaltyBalance + 10;
 
         setEvents(updatedEvents);
@@ -242,8 +285,8 @@ export const StellarProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
         setSuccessMessage(`Ticket purchased successfully! Inter-contract reward: +10 Loyalty Points. (Tx Hash: 0x${Math.random().toString(16).substring(2, 18)})`);
       } else {
-        // Real Stellar network transaction representation
-        await new Promise(resolve => setTimeout(resolve, 1800));
+        // Invoking real buy_ticket function on Soroban Smart Contract (mints loyalty points internally)
+        const txHash = await buyTicketTx(publicKey, eventId);
         
         const updatedEvents = [...events];
         updatedEvents[eventIndex] = {
@@ -253,14 +296,16 @@ export const StellarProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
         const updatedTickets = { ...userTickets };
         updatedTickets[eventId] = (updatedTickets[eventId] || 0) + 1;
-        const updatedLoyalty = loyaltyBalance + 10;
+        
+        // Query the new balance from the loyalty points smart contract
+        const newBalance = await getLoyaltyBalance(publicKey);
 
         setEvents(updatedEvents);
         setUserTickets(updatedTickets);
-        setLoyaltyBalance(updatedLoyalty);
-        saveState(updatedEvents, updatedTickets, updatedLoyalty);
+        setLoyaltyBalance(newBalance);
+        saveState(updatedEvents, updatedTickets, newBalance);
 
-        setSuccessMessage(`Ticket purchase transaction sent to Stellar. Points minted! Tx Hash: a5f19...d32b8e`);
+        setSuccessMessage(`Ticket purchase confirmed on-chain! Points minted. Tx Hash: ${txHash}`);
       }
     } catch (err: any) {
       setError(err.message || "Failed to buy ticket.");

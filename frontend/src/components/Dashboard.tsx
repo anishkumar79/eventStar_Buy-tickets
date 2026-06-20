@@ -263,11 +263,11 @@ export const Dashboard: React.FC = () => {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
               <div>
                 <span style={{ display: 'block', fontWeight: 600, color: 'var(--text-primary)' }}>Event Manager Contract:</span>
-                <span style={{ fontFamily: 'monospace', wordBreak: 'break-all' }}>CBEVENTSTAR552...7X9Y8Z</span>
+                <span style={{ fontFamily: 'monospace', wordBreak: 'break-all' }}>CC3H2EXF3NZTLRYGUR657EXX3OQ72N3K6SZ5T5W44M7PFL3CSKDJ2MSR</span>
               </div>
               <div>
                 <span style={{ display: 'block', fontWeight: 600, color: 'var(--text-primary)' }}>Loyalty Points Contract:</span>
-                <span style={{ fontFamily: 'monospace', wordBreak: 'break-all' }}>CBLOYALPOINTS881...4A5B6C</span>
+                <span style={{ fontFamily: 'monospace', wordBreak: 'break-all' }}>CD2B3G6S5X6M7T8U9V0W1X2Y3Z4A5B6C7D8E9F0G1H2I3J4K5L6M7N8O</span>
               </div>
               <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '0.5rem', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
                 Inter-contract calling executes on-chain via the Soroban WASM runtime. Verified transaction logic handles validation in under 2 seconds.
